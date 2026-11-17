@@ -9,6 +9,7 @@ import { env, isProd } from './config/env';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { authRouter } from './modules/auth/auth.routes';
 import { usersRouter } from './modules/users/users.routes';
+import { ticketsRouter } from './modules/tickets/ticket.routes';
 
 export function createApp() {
   const app = express();
@@ -42,7 +43,7 @@ export function createApp() {
   // Feature routers get mounted here as we build them:
     api.use('/auth', authRouter);
     api.use('/users', usersRouter);
-  // api.use('/tickets', ticketsRouter);
+  api.use('/tickets', ticketsRouter);
 
   app.use('/api', api);
   app.use(notFoundHandler);
