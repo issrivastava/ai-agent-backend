@@ -5,7 +5,7 @@ import { Workflow, nextWorkflowNumber, toPublicWorkflow } from './workflow.model
 import { updateWorkflowSchema, workflowInputSchema } from './workflow.schemas';
 
 // "WF-002" -> 2. Anything else is simply "not found".
-function parseWorkflowNumber(raw: string) {
+  export function parseWorkflowNumber(raw: string) {  
   const match = /^WF-(\d+)$/i.exec(raw);
   if (!match) throw HttpError.notFound('Workflow not found');
   return Number(match[1]);

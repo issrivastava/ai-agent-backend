@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authenticate, requirePermission } from '../../middleware/auth';
+import { startRun } from '../runs/run.controller';
 import {
   createWorkflow,
   deleteWorkflow,
@@ -17,5 +18,4 @@ workflowsRouter.get('/:id', getWorkflow);
 workflowsRouter.post('/', requirePermission('workflows:manage'), createWorkflow);
 workflowsRouter.patch('/:id', requirePermission('workflows:manage'), updateWorkflow);
 workflowsRouter.delete('/:id', requirePermission('workflows:manage'), deleteWorkflow);
-
-// POST /:id/run arrives with the runs module in the next step (permission: workflows:run).
+workflowsRouter.post('/:id/run', requirePermission('workflows:run'), startRun);

@@ -11,6 +11,8 @@ import { authRouter } from './modules/auth/auth.routes';
 import { usersRouter } from './modules/users/users.routes';
 import { ticketsRouter } from './modules/tickets/ticket.routes';
 import { workflowsRouter } from './modules/workflows/workflow.routes';
+import { runsRouter } from './modules/runs/run.routes';
+
 
 export function createApp() {
   const app = express();
@@ -46,6 +48,7 @@ export function createApp() {
     api.use('/users', usersRouter);
     api.use('/tickets', ticketsRouter);
     api.use('/workflows', workflowsRouter);
+    api.use('/runs', runsRouter);
 
   app.use('/api', api);
   app.use(notFoundHandler);

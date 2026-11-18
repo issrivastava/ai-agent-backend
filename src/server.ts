@@ -1,11 +1,12 @@
-//connects the DB, then starts listening
 import { createApp } from './app';
 import { connectDb, disconnectDb } from './config/db';
 import { env } from './config/env';
+import { startRunExecutor } from './modules/runs/run.executor';
 
 async function main() {
   await connectDb();
 
+  const stopExecutor = startRunExecutor();
   const server = createApp().listen(env.PORT, () => {
     console.log(`API listening on http://localhost:${env.PORT}/api`);
   });
@@ -13,6 +14,7 @@ async function main() {
   // Close connections cleanly when the process is stopped or the host restarts it.
   const shutdown = (signal: string) => {
     console.log(`${signal} received, shutting down…`);
+    stopExecutor();
     server.close(async () => {
       await disconnectDb();
       process.exit(0);
