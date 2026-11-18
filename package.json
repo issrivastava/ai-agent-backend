@@ -9,7 +9,8 @@
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "seed": "tsx --env-file=.env src/scripts/seed.ts",
-    "seed:tickets": "tsx --env-file=.env src/scripts/seed-tickets.ts"
+    "seed:tickets": "tsx --env-file=.env src/scripts/seed-tickets.ts",
+    "seed:workflows": "tsx --env-file=.env src/scripts/seed-workflows.ts"
   },
   "keywords": [],
   "author": "",
