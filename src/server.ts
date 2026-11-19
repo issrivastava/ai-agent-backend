@@ -3,40 +3,11 @@ import { connectDb, disconnectDb } from './config/db';
 import { env } from './config/env';
 import { startRunExecutor } from './modules/runs/run.executor';
 
-const app = createApp();
-
-// --- VERCEL SERVERLESS SETUP ---
-// Cache the DB connection across serverless invocations
-let dbPromise: Promise<void> | null = null;
-
-const ensureDbConnected = async () => {
-  if (!dbPromise) {
-    dbPromise = connectDb().catch((err) => {
-      dbPromise = null;
-      throw err;
-    });
-  }
-  return dbPromise;
-};
-
-// Middleware for Vercel so MongoDB connects before any route runs
-if (process.env.VERCEL) {
-  app.use(async (_req, _res, next) => {
-    try {
-      await ensureDbConnected();
-      next();
-    } catch (err) {
-      next(err);
-    }
-  });
-}
-
-// --- LOCAL DEVELOPMENT SETUP ---
 async function main() {
   await connectDb();
 
   const stopExecutor = startRunExecutor();
-  const server = app.listen(env.PORT, () => {
+  const server = createApp().listen(env.PORT, () => {
     console.log(`API listening on http://localhost:${env.PORT}/api`);
   });
 
@@ -53,12 +24,7 @@ async function main() {
   process.on('SIGTERM', () => shutdown('SIGTERM'));
 }
 
-// Only start the continuous server & background executor when NOT on Vercel
-if (!process.env.VERCEL) {
-  main().catch((err) => {
-    console.error('Failed to start server:', err);
-    process.exit(1);
-  });
-}
-
-export default app;
+main().catch((err) => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
+});
