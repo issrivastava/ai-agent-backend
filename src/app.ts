@@ -12,7 +12,7 @@ import { usersRouter } from './modules/users/users.routes';
 import { ticketsRouter } from './modules/tickets/ticket.routes';
 import { workflowsRouter } from './modules/workflows/workflow.routes';
 import { runsRouter } from './modules/runs/run.routes';
-
+import { extractionsRouter } from './modules/extractions/extraction.routes';
 
 export function createApp() {
   const app = express();
@@ -49,6 +49,7 @@ export function createApp() {
     api.use('/tickets', ticketsRouter);
     api.use('/workflows', workflowsRouter);
     api.use('/runs', runsRouter);
+    api.use('/extractions', extractionsRouter);
 
   app.use('/api', api);
   app.use(notFoundHandler);
