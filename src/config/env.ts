@@ -7,6 +7,9 @@ const schema = z.object({
   MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
   CLIENT_ORIGIN: z.string().min(1, 'CLIENT_ORIGIN is required'),
   JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
+  LLM_API_KEY: z.string().optional(),
+  LLM_BASE_URL: z.string().default('https://api.groq.com/openai/v1'),
+  LLM_MODEL: z.string().default('llama-3.3-70b-versatile'),
 });
 
 const parsed = schema.safeParse(process.env);

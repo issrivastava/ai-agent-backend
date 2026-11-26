@@ -42,11 +42,12 @@ export const Ticket = model<ITicket>('Ticket', ticketSchema);
 
 /** Ticket numbers start at 1001, so the first ticket is TCK-1001. */
 export const nextTicketNumber = async () => 1000 + (await nextSequence('ticket'));
+export const formatTicketId = (n: number) => `TCK-${n}`;
 
 // The shape the frontend's `Ticket` type expects.
 export function toPublicTicket(t: HydratedDocument<ITicket>) {
   return {
-    id: `TCK-${t.number}`,
+    id: formatTicketId(t.number),
     subject: t.subject,
     description: t.description,
     customer: t.customer,
