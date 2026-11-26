@@ -70,4 +70,61 @@ describe('auth', () => {
     const res = await api().get('/api/auth/me').set('Cookie', 'token=not-a-real-token');
     expect(res.status).toBe(401);
   });
+
+  it('requires a session to change a password', async () => {
+    const res = await api()
+      .post('/api/auth/change-password')
+      .send({ currentPassword: 'Password1', newPassword: 'NewPass123' });
+
+    expect(res.status).toBe(401);
+  });
+
+  it('changes the password once the current one is verified', async () => {
+    const { cookie } = await createUser('agent', 'change@test.dev');
+
+    const res = await api()
+      .post('/api/auth/change-password')
+      .set('Cookie', cookie)
+      .send({ currentPassword: 'Password1', newPassword: 'NewPass123' });
+
+    expect(res.status).toBe(204);
+
+    const oldLogin = await api()
+      .post('/api/auth/login')
+      .send({ email: 'change@test.dev', password: 'Password1' });
+    const newLogin = await api()
+      .post('/api/auth/login')
+      .send({ email: 'change@test.dev', password: 'NewPass123' });
+
+    expect(oldLogin.status).toBe(401);
+    expect(newLogin.status).toBe(200);
+  });
+
+  it('rejects a wrong current password and a weak new one', async () => {
+    const { cookie } = await createUser('agent', 'change2@test.dev');
+
+    const wrongCurrent = await api()
+      .post('/api/auth/change-password')
+      .set('Cookie', cookie)
+      .send({ currentPassword: 'Nope1234', newPassword: 'NewPass123' });
+    const weakNew = await api()
+      .post('/api/auth/change-password')
+      .set('Cookie', cookie)
+      .send({ currentPassword: 'Password1', newPassword: 'password' });
+
+    expect(wrongCurrent.status).toBe(400);
+    expect(weakNew.status).toBe(400);
+  });
+
+  it('refuses to reuse the current password', async () => {
+    const { cookie } = await createUser('agent', 'change3@test.dev');
+
+    const res = await api()
+      .post('/api/auth/change-password')
+      .set('Cookie', cookie)
+      .send({ currentPassword: 'Password1', newPassword: 'Password1' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toContain('different');
+  });
 });
