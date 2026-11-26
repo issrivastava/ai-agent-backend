@@ -20,3 +20,12 @@ export const registerLimiter = rateLimit({
   limit: 10,
   message: { message: 'Too many sign-ups from this address. Try again later.' },
 });
+
+// Guards password changes against guessing the current password.
+export const changePasswordLimiter = rateLimit({
+  ...base,
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  skipSuccessfulRequests: true,
+  message: { message: 'Too many password change attempts. Try again in a few minutes.' },
+});

@@ -3,7 +3,7 @@ import { HttpError } from '../../utils/http-error';
 import { DUMMY_HASH, hashPassword, verifyPassword } from '../../utils/password';
 import { clearAuthCookie, setAuthCookie, signToken } from '../../utils/token';
 import { toPublicUser, User } from '../users/user.model';
-import { loginSchema, registerSchema } from './auth.schemas';
+import { changePasswordSchema, loginSchema, registerSchema } from './auth.schemas';
 
 export const register: RequestHandler = async (req, res) => {
   const { name, email, password } = registerSchema.parse(req.body);
@@ -37,6 +37,27 @@ export const login: RequestHandler = async (req, res) => {
 
 export const logout: RequestHandler = (_req, res) => {
   clearAuthCookie(res);
+  res.status(204).end();
+};
+
+export const changePassword: RequestHandler = async (req, res) => {
+  const { currentPassword, newPassword } = changePasswordSchema.parse(req.body);
+
+  const user = await User.findById(req.user?.id).select('+passwordHash');
+  if (!user) throw HttpError.unauthorized();
+
+  // Always run a comparison so a wrong password is not answered any faster.
+  const valid = await verifyPassword(currentPassword, user.passwordHash ?? DUMMY_HASH);
+  // 400, not 401: a 401 makes the frontend treat the session as expired and sign the user out.
+  if (!valid) throw HttpError.badRequest('Current password is incorrect');
+
+  if (await verifyPassword(newPassword, user.passwordHash)) {
+    throw HttpError.badRequest('New password must be different from the current one');
+  }
+
+  user.passwordHash = await hashPassword(newPassword);
+  await user.save();
+
   res.status(204).end();
 };
 
