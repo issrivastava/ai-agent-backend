@@ -25,9 +25,10 @@ export interface IRun {
   number: number;
   workflowNumber: number;
   workflowName: string;
+  ticketNumber?: number; // the ticket this run works on, when there is one
   status: RunStatus;
   cursor: number; // index of the step currently in progress
-  stepDueAt: Date | null; // when the current step finishes. null while waiting for a human
+  stepDueAt: Date | null; // when the current step is due. null while waiting for a human
   startedBy: Types.ObjectId;
   startedAt: Date;
   finishedAt?: Date;
@@ -54,6 +55,7 @@ const runSchema = new Schema<IRun>(
     number: { type: Number, required: true, unique: true },
     workflowNumber: { type: Number, required: true },
     workflowName: { type: String, required: true },
+    ticketNumber: { type: Number },
     status: { type: String, enum: runStatuses, required: true },
     cursor: { type: Number, required: true, default: 0 },
     stepDueAt: { type: Date, default: null },
@@ -82,6 +84,7 @@ export function toPublicRun(r: HydratedDocument<IRun>) {
     id,
     workflowId: formatWorkflowId(r.workflowNumber),
     workflowName: r.workflowName,
+    ticketId: r.ticketNumber ? `TCK-${r.ticketNumber}` : undefined,
     status: r.status,
     startedAt: r.startedAt.toISOString(),
     finishedAt: r.finishedAt?.toISOString(),
