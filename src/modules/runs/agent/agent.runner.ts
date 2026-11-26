@@ -56,9 +56,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
       const res = await client.chat.completions.create({
         model: env.LLM_MODEL,
         temperature: 0.2,
-        max_tokens: 2000, // thinking tokens count toward this, so leave room for the answer
-        // gpt-oss models think before answering. Keep it short so replies are fast.
-        ...(env.LLM_MODEL.includes('gpt-oss') ? { reasoning_effort: 'low' as const } : {}),
+        max_tokens: 700,
         response_format: { type: 'json_object' },
         messages: [
           { role: 'system', content: system },
